@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: locked-in-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: locked_in_user
+      POSTGRES_PASSWORD: locked_in_password
+      POSTGRES_DB: locked_in_db
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+      TZ: "UTC"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./packages/db/init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U locked_in_user -d locked_in_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - locked-in-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  locked-in-network:
+    driver: bridge
