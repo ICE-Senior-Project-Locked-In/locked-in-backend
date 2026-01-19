@@ -9,7 +9,7 @@ async function createTestUser() {
     const name = "Locked In Admin";
 
     try {
-        const existingUser = await prisma.users.findUnique({
+        const existingUser = await prisma.user.findUnique({
             where: { email },
         });
 
@@ -20,7 +20,7 @@ async function createTestUser() {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = await prisma.users.create({
+        const user = await prisma.user.create({
             data: {
                 email,
                 password: hashedPassword,
