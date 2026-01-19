@@ -7,11 +7,212 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
-  userId    String   @id @default(uuid()) @map("user_id") @db.Uuid
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  BLOCKED
+}
+
+enum ItemType {
+  PET_FOOD
+  PET_TOY
+  PET_COSMETIC
+}
+
+enum PetType {
+  DOG
+  CAT
+  BIRD
+  FISH
+  REPTILE
+}
+
+enum PetEvolutionStage {
+  EGG
+  BABY
+  ADULT
+  ELDER
+}
+
+model User {
+  userId    String   @id @default(uuid()) @map("id") @db.Uuid
   email     String   @unique
-  password  String
-  name      String
+  name      String?
+  password  String?
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  nfcDevice              NFCDevice?
+  pet                    Pet?
+  inventory              Inventory?
+  accounts               OAuthAccount[]
+  focusLogs              FocusLog[]
+  userFocusTypes         UserFocusType[]
+  userUnblockActions     UserUnblockAction[]
+  sentFriendRequests     Friendship[]        @relation("SentFriendRequests")
+  receivedFriendRequests Friendship[]        @relation("ReceivedFriendRequests")
+}
+
+model NFCDevice {
+  deviceId     String    @id @default(uuid()) @map("id") @db.Uuid
+  userId       String    @unique @map("user_id") @db.Uuid
+  serialNumber String    @unique @map("serial_number")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  user User @relation(fields: [userId], references: [userId])
+}
+
+model Friendship {
+  friendshipId String           @id @default(uuid()) @map("id") @db.Uuid
+  requesterId  String           @map("requester_id") @db.Uuid
+  addresseeId  String           @map("addressee_id") @db.Uuid
+  status       FriendshipStatus @default(PENDING)
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+
+  requester User @relation("SentFriendRequests", fields: [requesterId], references: [userId], onDelete: Cascade)
+  addressee User @relation("ReceivedFriendRequests", fields: [addresseeId], references: [userId], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@index([requesterId])
+  @@index([addresseeId])
+  @@index([status])
+}
+
+// Master table for unblock actions
+model UnblockAction {
+  actionId  String   @id @default(uuid()) @map("id") @db.Uuid
+  name      String   @unique @map("name")
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  userUnblockActions UserUnblockAction[]
+}
+
+model UserUnblockAction {
+  id        String   @id @default(uuid()) @map("id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  actionId  String   @map("action_id") @db.Uuid
+  isVisible Boolean  @default(true) @map("is_visible")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user          User          @relation(fields: [userId], references: [userId])
+  unblockAction UnblockAction @relation(fields: [actionId], references: [actionId])
+
+  @@unique([userId, actionId])
+  @@index([userId])
+}
+
+// Master table for focus types
+model FocusType {
+  typeId    String   @id @default(uuid()) @map("id") @db.Uuid
+  name      String   @unique @map("name")
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  focusLogs      FocusLog[]
+  userFocusTypes UserFocusType[]
+}
+
+model UserFocusType {
+  id        String   @id @default(uuid()) @map("id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  typeId    String   @map("type_id") @db.Uuid
+  isVisible Boolean  @default(true) @map("is_visible")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User      @relation(fields: [userId], references: [userId])
+  focusType FocusType @relation(fields: [typeId], references: [typeId])
+
+  @@unique([userId, typeId])
+  @@index([userId])
+}
+
+model FocusLog {
+  logId     String   @id @default(uuid()) @map("id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  typeId    String   @map("type_id") @db.Uuid
+  startTime DateTime @map("start_time")
+  endTime   DateTime @map("end_time")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User      @relation(fields: [userId], references: [userId])
+  focusType FocusType @relation(fields: [typeId], references: [typeId])
+
+  @@index([userId])
+  @@index([typeId])
+}
+
+// Master table for items
+model Item {
+  itemId      String   @id @default(uuid()) @map("id") @db.Uuid
+  name        String   @unique
+  description String?
+  type        ItemType @map("type")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  userInventoryItems UserInventoryItem[]
+}
+
+model Inventory {
+  inventoryId String   @id @default(uuid()) @map("id") @db.Uuid
+  userId      String   @unique @map("user_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user  User                @relation(fields: [userId], references: [userId])
+  items UserInventoryItem[]
+}
+
+model UserInventoryItem {
+  id          String   @id @default(uuid()) @map("id") @db.Uuid
+  inventoryId String   @map("inventory_id") @db.Uuid
+  itemId      String   @map("item_id") @db.Uuid
+  quantity    Int      @default(1)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  inventory  Inventory @relation(fields: [inventoryId], references: [inventoryId], onDelete: Cascade)
+  item       Item      @relation(fields: [itemId], references: [itemId])
+  equippedBy Pet?
+
+  @@unique([inventoryId, itemId])
+  @@index([inventoryId])
+  @@index([itemId])
+}
+
+model Pet {
+  petId              String            @id @default(uuid()) @map("id") @db.Uuid
+  ownerId            String            @unique @map("owner_id") @db.Uuid
+  name               String
+  xp                 Int               @default(0)
+  type               PetType
+  evolutionStage     PetEvolutionStage
+  equippedCosmeticId String?           @unique @map("equipped_inventory_item_id") @db.Uuid
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+  deletedAt          DateTime?         @map("deleted_at")
+
+  owner            User               @relation(fields: [ownerId], references: [userId])
+  equippedCosmetic UserInventoryItem? @relation(fields: [equippedCosmeticId], references: [id])
+}
+
+model OAuthAccount {
+  accountId         String @id @default(uuid()) @map("id") @db.Uuid
+  userId            String @map("user_id") @db.Uuid
+  provider          String
+  providerAccountId String @map("provider_account_id")
+
+  user User @relation(fields: [userId], references: [userId])
+
+  @@unique([provider, providerAccountId])
 }
