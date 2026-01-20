@@ -6,7 +6,7 @@ export class UsersService {
     constructor(private readonly prismaService: PrismaService) { }
 
     async getAll() {
-        return this.prismaService.users.findMany({
+        return this.prismaService.user.findMany({
             orderBy: { createdAt: "desc" },
         });
     }

@@ -1,5 +1,4 @@
 import "dotenv/config";
-import type { CookieOptions } from "express";
 import type { LevelWithSilent } from "pino";
 import { z } from "zod";
 
@@ -25,7 +24,7 @@ const packageVersion = process.env.npm_package_version ?? "0.0.0";
 const envSchema = z.object({
     PORT: z.coerce.number().default(4000),
     ENV: z.enum(["development", "test", "production"]).default("development"),
-    API_BASE_URL: z.string().url().optional(),
+    API_BASE_URL: z.url().optional(),
     DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
     // JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
     // ACCESS_TOKEN_EXPIRES_IN: z.string().default("15m"),

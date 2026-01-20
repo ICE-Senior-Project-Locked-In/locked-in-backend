@@ -43,7 +43,7 @@ export class AppLogger extends ConsoleLogger implements LoggerService {
     stack?: string
   ) {
     super.error(message, stack, this.resolveContext(context));
-    this.pinoLogger.error({ ...(meta ?? {}), stack }, message);
+    this.pinoLogger.error(meta ? { ...meta, stack } : { stack }, message);
   }
 
   debug(meta: Record<string, unknown>, message: string, context?: string) {
