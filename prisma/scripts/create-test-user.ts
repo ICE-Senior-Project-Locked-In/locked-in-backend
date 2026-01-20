@@ -23,8 +23,12 @@ async function createTestUser() {
         const user = await prisma.user.create({
             data: {
                 email,
-                password: hashedPassword,
                 name,
+                credential: {
+                    create: {
+                        password: hashedPassword,
+                    }
+                }
             },
         });
 

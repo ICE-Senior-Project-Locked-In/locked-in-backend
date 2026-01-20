@@ -39,19 +39,28 @@ model User {
   userId    String   @id @default(uuid()) @map("id") @db.Uuid
   email     String   @unique
   name      String?
-  password  String?
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   nfcDevice              NFCDevice?
   pet                    Pet?
   inventory              Inventory?
-  accounts               OAuthAccount[]
+  credential             Credential?
   focusLogs              FocusLog[]
   userFocusTypes         UserFocusType[]
   userUnblockActions     UserUnblockAction[]
   sentFriendRequests     Friendship[]        @relation("SentFriendRequests")
   receivedFriendRequests Friendship[]        @relation("ReceivedFriendRequests")
+}
+
+model Credential {
+  credentialId String   @id @default(uuid()) @map("id") @db.Uuid
+  userId       String   @unique @map("user_id") @db.Uuid
+  password     String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [userId])
 }
 
 model NFCDevice {
@@ -204,15 +213,4 @@ model Pet {
 
   owner            User               @relation(fields: [ownerId], references: [userId])
   equippedCosmetic UserInventoryItem? @relation(fields: [equippedCosmeticId], references: [id])
-}
-
-model OAuthAccount {
-  accountId         String @id @default(uuid()) @map("id") @db.Uuid
-  userId            String @map("user_id") @db.Uuid
-  provider          String
-  providerAccountId String @map("provider_account_id")
-
-  user User @relation(fields: [userId], references: [userId])
-
-  @@unique([provider, providerAccountId])
 }
