@@ -1,35 +1,54 @@
-// @ts-check
-import eslint from '@eslint/js';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
+import js from "@eslint/js";
+import eslintConfigPrettier from "eslint-config-prettier";
+import tseslint from "typescript-eslint";
+import fs from "node:fs";
+import path from "node:path";
+import globals from "globals";
+import process from "node:process";
 
-export default tseslint.config(
-  {
-    ignores: ['eslint.config.mjs'],
-  },
-  eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
-  eslintPluginPrettierRecommended,
-  {
-    languageOptions: {
-      globals: {
-        ...globals.node,
-        ...globals.jest,
-      },
-      sourceType: 'commonjs',
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
+/**
+ * Shared base config with JavaScript + TypeScript + Prettier defaults.
+ * @type {import("eslint").Linter.FlatConfig[]}
+ */
+const baseConfig = [
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  eslintConfigPrettier,
+];
+
+const tsconfigPath = path.resolve(process.cwd(), "tsconfig.json");
+const hasTsconfig = fs.existsSync(tsconfigPath);
+
+const nodeConfig = {
+  name: "repo/node",
+  files: ["**/*.{ts,tsx,js,jsx}"],
+  languageOptions: {
+    globals: {
+      ...globals.node,
     },
   },
-  {
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn',
-      "prettier/prettier": ["error", { endOfLine: "auto" }],
+  ignores: [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.next/**",
+    "**/build/**",
+  ],
+};
+
+if (hasTsconfig) {
+  nodeConfig.settings = {
+    "import/resolver": {
+      typescript: {
+        project: tsconfigPath,
+      },
     },
-  },
-);
+  };
+}
+
+/**
+ * Flat config for Node/Express-style projects.
+ * @type {import("eslint").Linter.FlatConfig[]}
+ */
+export const config = [...baseConfig, nodeConfig];
+
+export default config;
