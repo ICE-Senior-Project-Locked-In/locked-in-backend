@@ -2,6 +2,7 @@ import { HttpStatus, Injectable } from "@nestjs/common";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { randomBytes } from "node:crypto";
+import { MasterDataService } from "@/database/master-data/master-data.service";
 import { PrismaService } from "@/database/prisma.service";
 import { RedisService } from "@/infrastructure/redis/redis.service";
 import { config } from "@/config/env";
@@ -31,6 +32,7 @@ const refreshTokenExpiresIn = config.refreshTokenExpiresIn as jwt.SignOptions["e
 export class AuthService {
     constructor(
         private readonly prisma: PrismaService,
+        private readonly master: MasterDataService,
         private readonly redisService: RedisService
     ) { }
 
@@ -96,6 +98,8 @@ export class AuthService {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
+        const unblockActionIds = this.master.getUnblockActionIds();
+        const focusTypeIds = this.master.getFocusTypeIds();
 
         const user = await this.prisma.user.create({
             data: {
@@ -106,6 +110,19 @@ export class AuthService {
                         password: hashedPassword,
                     },
                 },
+                userUnblockActions: {
+                    create: unblockActionIds.map((actionId) => ({
+                        actionId,
+                    })),
+                },
+                userFocusTypes: {
+                    create: focusTypeIds.map((typeId) => ({
+                        typeId,
+                    })),
+                },
+                inventory: {
+                    create: {}
+                }
             },
         });
 
