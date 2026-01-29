@@ -5,15 +5,17 @@ import { DatabaseModule } from './database/database.module';
 import { LoggerModule } from './logger/logger.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from '@/modules/users/users.module';
+import { NFCModule } from './modules/nfc/nfc.module';
 
 @Module({
   imports: [
     LoggerModule,
     DatabaseModule,
     AuthModule,
-    UsersModule
+    UsersModule,
+    NFCModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
