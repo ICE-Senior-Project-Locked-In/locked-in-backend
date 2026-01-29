@@ -35,10 +35,12 @@ jobs:
         run: pnpm db:generate
         env:
           DATABASE_URL: "file:./dev.db?connection_limit=1"
+        
+      - name: Lint
+        run: pnpm lint
 
       - name: Run api tests
         run: pnpm test
 
       - name: Build api
-        run: |
-          pnpm build
+        run: pnpm build
