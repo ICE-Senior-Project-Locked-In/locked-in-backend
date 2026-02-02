@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { createApiResponseSchema } from "@/common/api/api.schema";
 
 export class NFCValidation {
     static readonly serialNumberSchema = z.string().min(1, "Serial number is required");
@@ -12,6 +13,8 @@ export const nfcSchema = z.object({
     updatedAt: z.date(),
     deletedAt: z.date(),
 })
+
+export const nfcResponseSchema = createApiResponseSchema(nfcSchema);
 
 export type NFCData = z.infer<typeof nfcSchema>;
 

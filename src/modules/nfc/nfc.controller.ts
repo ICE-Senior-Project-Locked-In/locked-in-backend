@@ -5,7 +5,7 @@ import { JwtAuthGuard } from "@/common/http/guards/jwt-auth.guard";
 import { CurrentUser } from "@/common/http/decorators/current-user.decorator";
 import { SkipResponseWrapper } from "@/common/http/decorators/skip-response.decorator";
 import type { AuthUser } from "@/common/interfaces/auth-user.interface";
-import { PairNFCDto } from "./dto/nfc.dto";
+import { NFCResponseDto, PairNFCDto } from "./dto/nfc.dto";
 import { NFCService } from "./nfc.service";
 
 @ApiTags("NFC")
@@ -21,7 +21,7 @@ export class NFCController {
     }
 
     @Post()
-    @ApiOkResponse({ type: PairNFCDto, description: "NFC Pairing successful" })
+    @ApiOkResponse({ type: NFCResponseDto, description: "NFC Pairing successful" })
     @ApiBody({ type: PairNFCDto })
     async pair(
         @Body() data: PairNFCDto,
