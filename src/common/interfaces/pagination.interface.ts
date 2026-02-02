@@ -15,3 +15,8 @@ export interface PaginationMetaData {
     hasNext: boolean;
     hasPrevious: boolean;
 }
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    pagination: PaginationMetaData;
+}

@@ -1,4 +1,5 @@
 import { PaginationOptions, PaginationMetaData, OffsetPaginationOptions } from "../interfaces/pagination.interface";
+export type { PaginationMetaData, PaginationOptions, OffsetPaginationOptions, PaginatedResponse } from "../interfaces/pagination.interface";
 
 export class PaginationHelper {
     static getOptions(query: { page?: number; itemsPerPage?: number }): PaginationOptions | undefined {
