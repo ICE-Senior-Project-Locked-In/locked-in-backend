@@ -5,5 +5,6 @@ import { FocusLogController } from './focus-log.controller';
 @Module({
     controllers: [FocusLogController],
     providers: [FocusLogService],
+    exports: [FocusLogService],
 })
 export class FocusLogModule { }

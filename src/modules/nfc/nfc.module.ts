@@ -5,5 +5,6 @@ import { NFCController } from './nfc.controller';
 @Module({
     controllers: [NFCController],
     providers: [NFCService],
+    exports: [NFCService],
 })
 export class NFCModule { }
