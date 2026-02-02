@@ -10,16 +10,16 @@ export const focusTypeSchema = z.object({
     typeId: z.uuid(),
     name: z.string(),
     isDefault: z.boolean(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime(),
 });
 
 export const userFocusTypeSchema = z.object({
     id: z.uuid(),
     userId: z.uuid(),
     typeId: z.uuid(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime(),
 });
 
 export const focusTypeResponseSchema = createApiResponseSchema(focusTypeSchema);

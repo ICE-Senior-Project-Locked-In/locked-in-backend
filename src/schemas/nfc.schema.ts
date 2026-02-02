@@ -9,9 +9,9 @@ export const nfcSchema = z.object({
     deviceId: z.uuid(),
     userId: z.uuid(),
     serialNumber: z.string(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
-    deletedAt: z.date(),
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime(),
+    deletedAt: z.iso.datetime(),
 })
 
 export const nfcResponseSchema = createApiResponseSchema(nfcSchema);

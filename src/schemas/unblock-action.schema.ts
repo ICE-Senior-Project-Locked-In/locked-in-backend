@@ -10,16 +10,16 @@ export const unblockActionSchema = z.object({
     actionId: z.uuid(),
     name: z.string(),
     isDefault: z.boolean(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime(),
 });
 
 export const userUnblockActionSchema = z.object({
     id: z.uuid(),
     userId: z.uuid(),
     actionId: z.uuid(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime(),
 });
 
 export const unblockActionResponseSchema = createApiResponseSchema(unblockActionSchema);

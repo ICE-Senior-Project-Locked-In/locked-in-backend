@@ -11,8 +11,8 @@ export const userSchema = z.object({
     userId: z.uuid(),
     email: z.email(),
     name: z.string().min(1).nullable(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime(),
 })
 
 export const userResponseSchema = createApiResponseSchema(userSchema);
