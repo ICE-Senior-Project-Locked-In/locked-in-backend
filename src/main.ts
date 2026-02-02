@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import type { Request, Response } from "express";
-import { NestFactory } from "@nestjs/core";
+import { NestFactory, Reflector } from "@nestjs/core";
 import { RequestMethod, VersioningType } from '@nestjs/common';
 import { SwaggerModule } from "@nestjs/swagger";
 import { config } from "@/config/env";
@@ -10,6 +10,7 @@ import cors from "cors";
 import helmet from "helmet";
 import { ZodValidationPipe } from "nestjs-zod";
 import { buildSwaggerConfig } from "@/docs/swagger";
+import { ApiResponseInterceptor } from "./common/http/interceptors/api-response.interceptor";
 import { AppLogger } from './logger/app-logger.service';
 
 async function bootstrap() {
@@ -17,7 +18,12 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
+  const reflector = app.get(Reflector);
   const appLogger = app.get(AppLogger);
+
+  app.useGlobalInterceptors(
+    new ApiResponseInterceptor(reflector),
+  );
 
   app.use(
     helmet({
