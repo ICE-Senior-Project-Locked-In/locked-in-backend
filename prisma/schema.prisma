@@ -76,18 +76,18 @@ model NFCDevice {
 
 model Friendship {
   friendshipId String           @id @default(uuid()) @map("id") @db.Uuid
-  requesterId  String           @map("requester_id") @db.Uuid
-  addresseeId  String           @map("addressee_id") @db.Uuid
+  senderId     String           @map("sender_id") @db.Uuid
+  receiverId   String           @map("receiver_id") @db.Uuid
   status       FriendshipStatus @default(PENDING)
   createdAt    DateTime         @default(now()) @map("created_at")
   updatedAt    DateTime         @updatedAt @map("updated_at")
 
-  requester User @relation("SentFriendRequests", fields: [requesterId], references: [userId], onDelete: Cascade)
-  addressee User @relation("ReceivedFriendRequests", fields: [addresseeId], references: [userId], onDelete: Cascade)
+  sender   User @relation("SentFriendRequests", fields: [senderId], references: [userId], onDelete: Cascade)
+  receiver User @relation("ReceivedFriendRequests", fields: [receiverId], references: [userId], onDelete: Cascade)
 
-  @@unique([requesterId, addresseeId])
-  @@index([requesterId])
-  @@index([addresseeId])
+  @@unique([senderId, receiverId])
+  @@index([senderId])
+  @@index([receiverId])
   @@index([status])
 }
 
