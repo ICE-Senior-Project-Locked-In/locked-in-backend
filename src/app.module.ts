@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
+import { InfrastructureModule } from './infrastructure/infrastructure.module';
 import { LoggerModule } from './logger/logger.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from '@/modules/user/user.module';
@@ -15,6 +16,7 @@ import { UnblockActionModule } from './modules/unblock-action/unblock-action.mod
   imports: [
     LoggerModule,
     DatabaseModule,
+    InfrastructureModule,
     AuthModule,
     UserModule,
     FriendModule,
