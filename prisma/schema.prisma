@@ -133,7 +133,6 @@ model UserFocusType {
   id        String   @id @default(uuid()) @map("id") @db.Uuid
   userId    String   @map("user_id") @db.Uuid
   typeId    String   @map("type_id") @db.Uuid
-  isVisible Boolean  @default(true) @map("is_visible")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -145,13 +144,13 @@ model UserFocusType {
 }
 
 model FocusLog {
-  logId     String   @id @default(uuid()) @map("id") @db.Uuid
-  userId    String   @map("user_id") @db.Uuid
-  typeId    String   @map("type_id") @db.Uuid
-  startTime DateTime @map("start_time")
-  endTime   DateTime @map("end_time")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  logId     String    @id @default(uuid()) @map("id") @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  typeId    String    @map("type_id") @db.Uuid
+  startTime DateTime  @map("start_time")
+  endTime   DateTime? @map("end_time")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
   user      User      @relation(fields: [userId], references: [userId])
   focusType FocusType @relation(fields: [typeId], references: [typeId])
