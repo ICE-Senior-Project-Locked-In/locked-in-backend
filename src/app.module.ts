@@ -6,6 +6,8 @@ import { LoggerModule } from './logger/logger.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from '@/modules/users/users.module';
 import { NFCModule } from './modules/nfc/nfc.module';
+import { FocusTypeModule } from './modules/focus/focus-type/focus-type.module';
+import { FocusLogModule } from './modules/focus/focus-log/focus-log.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { NFCModule } from './modules/nfc/nfc.module';
     AuthModule,
     UsersModule,
     NFCModule,
+    FocusTypeModule,
+    FocusLogModule,
   ],
   controllers: [AppController],
   providers: [AppService],
