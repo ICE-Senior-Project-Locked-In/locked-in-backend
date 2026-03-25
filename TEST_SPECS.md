@@ -25,6 +25,25 @@ pnpm run test:e2e
 pnpm run test:cov
 ```
 
+## Executed Test Cases
+
+The following test cases are currently executed in this repository:
+
+### Unit tests (`pnpm run test`, `pnpm run test:watch`, `pnpm run test:cov`, `pnpm run test:debug`)
+
+- `src/app.controller.spec.ts`
+  - `AppController > root > should return "Server is running!"`
+
+### E2E tests (`pnpm run test:e2e`)
+
+- `test/app.e2e-spec.ts`
+  - `AppController (e2e) > / (GET)`
+
+## Script to Test Mapping
+
+- `pnpm run test` → runs Jest with `rootDir: src` and `testRegex: .*\\.spec\\.ts$`
+- `pnpm run test:e2e` → runs Jest with `test/jest-e2e.json` and `.e2e-spec.ts` files in `test/`
+
 ## Test Conventions
 
 - Name unit test files as `*.spec.ts` and colocate near source where practical.
