@@ -25,6 +25,13 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Project documentation
+
+- API documentation: [API.md](./API.md)
+- Test specs documentation: [TEST_SPECS.md](./TEST_SPECS.md)
+- Interactive API docs (when server is running): `/docs`
+- OpenAPI spec JSON (when server is running): `/openapi.json`
+
 ## Project setup
 
 ```bash
