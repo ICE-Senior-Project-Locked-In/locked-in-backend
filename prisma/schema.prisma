@@ -215,8 +215,7 @@ model UserInventoryItem {
 }
 
 model Pet {
-  petId     String    @id @default(uuid()) @map("id") @db.Uuid
-  ownerId   String    @unique @map("owner_id") @db.Uuid
+  ownerId   String    @id @unique @map("owner_id") @db.Uuid
   name      String
   xp        Int       @default(0)
   type      PetType
