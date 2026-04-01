@@ -11,6 +11,7 @@ import { NFCModule } from './modules/nfc/nfc.module';
 import { FocusTypeModule } from './modules/focus/focus-type/focus-type.module';
 import { FocusLogModule } from './modules/focus/focus-log/focus-log.module';
 import { UnblockActionModule } from './modules/unblock-action/unblock-action.module';
+import { PetModule } from './modules/pet/pet.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UnblockActionModule } from './modules/unblock-action/unblock-action.mod
     FocusTypeModule,
     FocusLogModule,
     UnblockActionModule,
+    PetModule,
   ],
   controllers: [AppController],
   providers: [AppService],
