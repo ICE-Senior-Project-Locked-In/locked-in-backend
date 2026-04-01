@@ -16,23 +16,13 @@ enum FriendshipStatus {
 
 enum ItemType {
   PET_FOOD
-  PET_TOY
-  PET_COSMETIC
+  ROOM_DECOR
 }
 
 enum PetType {
-  DOG
-  CAT
-  BIRD
-  FISH
-  REPTILE
-}
-
-enum PetEvolutionStage {
-  EGG
-  BABY
-  ADULT
-  ELDER
+  ORANGE_CAT
+  GRAY_CAT
+  WHITE_CAT
 }
 
 model User {
@@ -47,6 +37,7 @@ model User {
   inventory              Inventory?
   credential             Credential?
   focusLogs              FocusLog[]
+  focusSchedules         FocusSchedule[]
   userFocusTypes         UserFocusType[]
   userUnblockActions     UserUnblockAction[]
   sentFriendRequests     Friendship[]        @relation("SentFriendRequests")
@@ -126,6 +117,7 @@ model FocusType {
 
   focusLogs      FocusLog[]
   userFocusTypes UserFocusType[]
+  focusSchedules FocusSchedule[]
 }
 
 model UserFocusType {
@@ -158,6 +150,32 @@ model FocusLog {
   @@index([typeId])
 }
 
+model FocusSchedule {
+  scheduleId String   @id @default(uuid()) @map("id") @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  typeId     String   @map("type_id") @db.Uuid
+  icon       String?
+  startTime  DateTime
+  endTime    DateTime
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  days      FocusScheduleDay[]
+  user      User               @relation(fields: [userId], references: [userId])
+  focusType FocusType          @relation(fields: [typeId], references: [typeId])
+}
+
+model FocusScheduleDay {
+  id         String @id @default(uuid()) @db.Uuid
+  scheduleId String @db.Uuid
+  dayOfWeek  Int
+
+  schedule FocusSchedule @relation(fields: [scheduleId], references: [scheduleId], onDelete: Cascade)
+
+  @@index([scheduleId])
+}
+
 // Master table for items
 model Item {
   itemId      String   @id @default(uuid()) @map("id") @db.Uuid
@@ -188,9 +206,8 @@ model UserInventoryItem {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  inventory  Inventory @relation(fields: [inventoryId], references: [inventoryId], onDelete: Cascade)
-  item       Item      @relation(fields: [itemId], references: [itemId])
-  equippedBy Pet?
+  inventory Inventory @relation(fields: [inventoryId], references: [inventoryId], onDelete: Cascade)
+  item      Item      @relation(fields: [itemId], references: [itemId])
 
   @@unique([inventoryId, itemId])
   @@index([inventoryId])
@@ -198,17 +215,14 @@ model UserInventoryItem {
 }
 
 model Pet {
-  petId              String            @id @default(uuid()) @map("id") @db.Uuid
-  ownerId            String            @unique @map("owner_id") @db.Uuid
-  name               String
-  xp                 Int               @default(0)
-  type               PetType
-  evolutionStage     PetEvolutionStage
-  equippedCosmeticId String?           @unique @map("equipped_inventory_item_id") @db.Uuid
-  createdAt          DateTime          @default(now()) @map("created_at")
-  updatedAt          DateTime          @updatedAt @map("updated_at")
-  deletedAt          DateTime?         @map("deleted_at")
+  petId     String    @id @default(uuid()) @map("id") @db.Uuid
+  ownerId   String    @unique @map("owner_id") @db.Uuid
+  name      String
+  xp        Int       @default(0)
+  type      PetType
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-  owner            User               @relation(fields: [ownerId], references: [userId])
-  equippedCosmetic UserInventoryItem? @relation(fields: [equippedCosmeticId], references: [id])
+  owner User @relation(fields: [ownerId], references: [userId])
 }

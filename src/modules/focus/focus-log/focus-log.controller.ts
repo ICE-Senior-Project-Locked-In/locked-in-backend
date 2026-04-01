@@ -19,7 +19,7 @@ export class FocusLogController {
         this.logger.setContext(FocusLogController.name);
     }
 
-    @Get("me")
+    @Get()
     @ApiOkResponse({ type: FocusLogListResponseDto, description: "Retrieve the current user's focus logs" })
     async getUserFocusLogs(
         @CurrentUser() user: AuthUser
@@ -27,7 +27,7 @@ export class FocusLogController {
         return this.focusLogService.getFocusLogsByUserId(user.userId);
     }
 
-    @Get("me/active")
+    @Get("active")
     @ApiOkResponse({ type: FocusLogResponseDto, description: "Retrieve the current user's active focus log" })
     async getActiveUserFocusLog(
         @CurrentUser() user: AuthUser
@@ -35,7 +35,7 @@ export class FocusLogController {
         return this.focusLogService.getActiveFocusLogByUserId(user.userId);
     }
 
-    @Post("me/start")
+    @Post("start")
     @ApiOkResponse({ type: FocusLogResponseDto, description: "Start a new focus log for the current user" })
     @ApiBody({ type: StartFocusLogDto })
     async startUserFocusLog(
@@ -50,7 +50,7 @@ export class FocusLogController {
         return this.focusLogService.startFocusLog(user.userId, typeId, startTime);
     }
 
-    @Put("me/:logId/end")
+    @Put(":logId/end")
     @ApiOkResponse({ type: FocusLogResponseDto, description: "End the current user's focus log" })
     @ApiBody({ type: EndFocusLogDto })
     async endUserFocusLog(
