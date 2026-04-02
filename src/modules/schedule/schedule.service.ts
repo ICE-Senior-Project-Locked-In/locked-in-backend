@@ -22,9 +22,21 @@ export class ScheduleService {
     }
 
     async listByUserId(userId: string) {
-        return this.prismaService.focusSchedule.findMany({
+        const schedules = await this.prismaService.focusSchedule.findMany({
             where: { userId },
+            include: {
+                days: {
+                    select: {
+                        dayOfWeek: true,
+                    },
+                },
+            }
         });
+
+        return schedules.map((schedule) => ({
+            ...schedule,
+            daysOfWeek: schedule.days.map((day) => day.dayOfWeek),
+        }));
     }
 
     async create(userId: string, data: CreateScheduleDto) {

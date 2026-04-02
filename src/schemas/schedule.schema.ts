@@ -28,8 +28,12 @@ export const scheduleSchema = z.object({
     updatedAt: z.iso.datetime(),
 });
 
-export const scheduleResponseSchema = createApiResponseSchema(scheduleSchema);
-export const scheduleListResponseSchema = createApiResponseSchema(z.array(scheduleSchema));
+export const daysOfWeekSchema = z.object({
+    daysOfWeek: z.array(z.number().int().min(0).max(6)),
+});
+
+export const scheduleResponseSchema = createApiResponseSchema(scheduleSchema.extend(daysOfWeekSchema.shape));
+export const scheduleListResponseSchema = createApiResponseSchema(z.array(scheduleSchema.extend(daysOfWeekSchema.shape)));
 
 export type ScheduleData = z.infer<typeof scheduleSchema>;
 export type ScheduleListData = z.infer<typeof scheduleListResponseSchema>;
