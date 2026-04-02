@@ -12,6 +12,7 @@ import { FocusTypeModule } from './modules/focus/focus-type/focus-type.module';
 import { FocusLogModule } from './modules/focus/focus-log/focus-log.module';
 import { UnblockActionModule } from './modules/unblock-action/unblock-action.module';
 import { PetModule } from './modules/pet/pet.module';
+import { ScheduleModule } from './modules/schedule/schedule.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PetModule } from './modules/pet/pet.module';
     FocusLogModule,
     UnblockActionModule,
     PetModule,
+    ScheduleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
