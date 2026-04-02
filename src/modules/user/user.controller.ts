@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Param, UseGuards } from "@nestjs/common";
+import { Controller, Get, Put, Body, Query, Param, UseGuards } from "@nestjs/common";
 import { ApiTags, ApiBearerAuth, ApiOkResponse } from "@nestjs/swagger";
 import { AppLogger } from "@/logger/app-logger.service";
 import { JwtAuthGuard } from "@/common/http/guards/jwt-auth.guard";
@@ -11,6 +11,7 @@ import {
     UserListResponseDto,
     UserFiltersDto,
     UserIdParamDto,
+    UpdateUserDto,
 } from "./dto/user.dto";
 import { User } from "@prisma/client";
 
@@ -43,5 +44,15 @@ export class UserController {
     ): Promise<User | null> {
         const { userId } = params;
         return this.userService.getUserById(userId);
+    }
+
+    @Put(":userId")
+    @ApiOkResponse({ type: UserResponseDto, description: "Update user by ID" })
+    async updateUser(
+        @Param() params: UserIdParamDto,
+        @Body() data: UpdateUserDto
+    ): Promise<User> {
+        const { userId } = params;
+        return this.userService.updateUser(userId, data);
     }
 }
