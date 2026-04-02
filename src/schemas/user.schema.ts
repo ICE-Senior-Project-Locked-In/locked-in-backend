@@ -4,7 +4,7 @@ import { createApiResponseSchema } from "@/common/api/api.schema";
 export class UserValidation {
     static readonly userIdSchema = z.uuid("Invalid user ID format");
     static readonly nameSchema = z.string().min(1, "Name filter must be at least 1 character");
-    static readonly balanceSchema = z.number().int("Balance filter must be an integer");
+    static readonly balanceSchema = z.number().int("Balance must be an integer").min(0, "Balance must be a non-negative number");
     static readonly excludeCurrentUserSchema = z.boolean();
 }
 
