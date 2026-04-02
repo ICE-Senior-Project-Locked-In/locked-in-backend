@@ -29,6 +29,7 @@ model User {
   userId    String   @id @default(uuid()) @map("id") @db.Uuid
   email     String   @unique
   name      String?
+  balance   Int      @default(0)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
