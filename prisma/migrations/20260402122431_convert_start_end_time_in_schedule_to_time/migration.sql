@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "FocusSchedule" ADD COLUMN     "timezone" TEXT NOT NULL DEFAULT 'UTC',
+ALTER COLUMN "end_time" SET DATA TYPE TIME,
+ALTER COLUMN "start_time" SET DATA TYPE TIME;

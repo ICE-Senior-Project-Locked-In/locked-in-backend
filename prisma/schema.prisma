@@ -154,12 +154,14 @@ model FocusSchedule {
   scheduleId String   @id @default(uuid()) @map("id") @db.Uuid
   userId     String   @map("user_id") @db.Uuid
   typeId     String   @map("type_id") @db.Uuid
-  icon       String?
-  startTime  DateTime
-  endTime    DateTime
+  title      String   @map("title")
+  icon       String?  @map("icon")
+  startTime  DateTime @map("start_time") @db.Time
+  endTime    DateTime @map("end_time") @db.Time
+  timezone   String   @default("UTC")
   active     Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   days      FocusScheduleDay[]
   user      User               @relation(fields: [userId], references: [userId])
@@ -173,7 +175,7 @@ model FocusScheduleDay {
 
   schedule FocusSchedule @relation(fields: [scheduleId], references: [scheduleId], onDelete: Cascade)
 
-  @@index([scheduleId])
+  @@index([scheduleId, dayOfWeek])
 }
 
 // Master table for items
