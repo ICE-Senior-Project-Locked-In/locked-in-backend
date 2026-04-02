@@ -202,12 +202,13 @@ model Inventory {
 }
 
 model UserInventoryItem {
-  id          String   @id @default(uuid()) @map("id") @db.Uuid
-  inventoryId String   @map("inventory_id") @db.Uuid
-  itemId      String   @map("item_id") @db.Uuid
-  quantity    Int      @default(1)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id               String   @id @default(uuid()) @map("id") @db.Uuid
+  inventoryId      String   @map("inventory_id") @db.Uuid
+  itemId           String   @map("item_id") @db.Uuid
+  quantity         Int      @default(1)
+  customAttributes Json?    @map("custom_attributes") @db.JsonB
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
   inventory Inventory @relation(fields: [inventoryId], references: [inventoryId], onDelete: Cascade)
   item      Item      @relation(fields: [itemId], references: [itemId])

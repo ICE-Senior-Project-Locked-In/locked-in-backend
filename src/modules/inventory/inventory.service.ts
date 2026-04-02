@@ -74,7 +74,7 @@ export class InventoryService {
 
     async createItem(userId: string, data: CreateInventoryItemDto) {
         const { inventoryId } = await this.ensureInventoryExists(userId);
-        const { itemId, quantity } = data;
+        const { itemId, ...itemData } = data;
 
         await this.ensureItemExists(itemId);
 
@@ -83,7 +83,7 @@ export class InventoryService {
                 data: {
                     inventoryId,
                     itemId,
-                    quantity,
+                    ...itemData,
                 },
             });
         } catch (error) {
@@ -101,7 +101,6 @@ export class InventoryService {
 
     async updateItem(userId: string, itemId: string, data: UpdateInventoryItemDto) {
         const { inventoryId } = await this.ensureUserItemExists(userId, itemId);
-        const { quantity } = data;
 
         return this.prismaService.userInventoryItem.update({
             where: {
@@ -110,9 +109,7 @@ export class InventoryService {
                     itemId,
                 },
             },
-            data: {
-                quantity,
-            },
+            data,
         });
     }
 }
