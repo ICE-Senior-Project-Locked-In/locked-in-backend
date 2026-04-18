@@ -72,7 +72,7 @@ describe("ScheduleService", () => {
         it("should create a schedule with days", async () => {
             const userId = "user-1";
             const data: CreateScheduleDto = {
-                typeId: "type-1",
+                modeId: "mode-1",
                 title: "Morning Focus",
                 startTime: "09:00:00",
                 endTime: "10:00:00",
@@ -140,10 +140,9 @@ describe("ScheduleService", () => {
 
             await service.update(userId, scheduleId, data);
 
-            const { daysOfWeek, ...scheduleData } = data;
             expect(focusScheduleMock.update).toHaveBeenCalledWith({
                 where: { scheduleId, userId },
-                data: { ...scheduleData },
+                data,
             });
         });
 

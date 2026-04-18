@@ -62,7 +62,6 @@ describe("AuthService", () => {
 
     const masterDataServiceMock = {
         getUnblockActionIds: jest.fn().mockReturnValue(["action-1", "action-2"]),
-        getFocusTypeIds: jest.fn().mockReturnValue(["type-1", "type-2"]),
     } as unknown as MasterDataService;
 
     const redisClientMock = {
@@ -124,7 +123,7 @@ describe("AuthService", () => {
             expect(result.refreshToken).toBe("refresh-token-jwt");
         });
 
-        it("should create user with default unblock actions and focus types", async () => {
+        it("should create user with default unblock actions", async () => {
             userMock.findUnique.mockResolvedValue(null);
             (bcryptMock.hash as jest.Mock).mockResolvedValue("hashed-password");
             userMock.create.mockResolvedValue(mockUser);
@@ -137,9 +136,6 @@ describe("AuthService", () => {
                     data: expect.objectContaining({
                         userUnblockActions: {
                             create: [{ actionId: "action-1" }, { actionId: "action-2" }],
-                        },
-                        userFocusTypes: {
-                            create: [{ typeId: "type-1" }, { typeId: "type-2" }],
                         },
                         inventory: { create: {} },
                     }),

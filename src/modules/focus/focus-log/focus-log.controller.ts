@@ -42,12 +42,12 @@ export class FocusLogController {
         @Body() data: StartFocusLogDto,
         @CurrentUser() user: AuthUser
     ) {
-        const { typeId, startTime } = data;
+        const { modeId, startTime } = data;
         this.logger.info(
-            { module: "focus-log", userId: user.userId, focusTypeId: typeId },
+            { module: "focus-log", userId: user.userId, focusModeId: modeId },
             "Starting new focus log"
         );
-        return this.focusLogService.startFocusLog(user.userId, typeId, startTime);
+        return this.focusLogService.startFocusLog(user.userId, modeId, startTime);
     }
 
     @Put(":logId/end")
