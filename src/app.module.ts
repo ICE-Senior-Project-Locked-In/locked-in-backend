@@ -8,7 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from '@/modules/user/user.module';
 import { FriendModule } from './modules/friend/friend.module';
 import { NFCModule } from './modules/nfc/nfc.module';
-import { FocusTypeModule } from './modules/focus/focus-type/focus-type.module';
+import { FocusModeModule } from './modules/focus/focus-mode/focus-mode.module';
 import { FocusLogModule } from './modules/focus/focus-log/focus-log.module';
 import { UnblockActionModule } from './modules/unblock-action/unblock-action.module';
 import { PetModule } from './modules/pet/pet.module';
@@ -24,7 +24,7 @@ import { InventoryModule } from './modules/inventory/inventory.module';
     UserModule,
     FriendModule,
     NFCModule,
-    FocusTypeModule,
+    FocusModeModule,
     FocusLogModule,
     UnblockActionModule,
     PetModule,

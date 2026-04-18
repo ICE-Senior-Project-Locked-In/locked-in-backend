@@ -1,5 +1,5 @@
 import { HttpStatus } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
+import { ItemType, Prisma } from "@prisma/client";
 import { HttpApiException } from "@/common/exceptions/http-api.exception";
 import { PrismaService } from "@/database/prisma.service";
 import { InventoryService } from "./inventory.service";
@@ -59,10 +59,10 @@ describe("InventoryService", () => {
             inventoryMock.findUnique.mockResolvedValue({ inventoryId, userId });
             userInventoryItemMock.findMany.mockResolvedValue([]);
 
-            await service.listItemsByUserId(userId, "CONSUMABLE" as any);
+            await service.listItemsByUserId(userId, ItemType.PET_FOOD);
 
             expect(userInventoryItemMock.findMany).toHaveBeenCalledWith({
-                where: { inventoryId, item: { type: "CONSUMABLE" } },
+                where: { inventoryId, item: { type: ItemType.PET_FOOD } },
             });
         });
 

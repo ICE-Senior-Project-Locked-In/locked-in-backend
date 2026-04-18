@@ -41,21 +41,20 @@ An in-memory cache for master/reference data that is frequently read and rarely 
 ### Responsibilities
 
 - Implements `OnModuleInit` — queries the database once on startup and stores results in memory.
-- Exposes `getUnblockActionIds()` and `getFocusTypeIds()` for fast synchronous access.
+- Exposes `getUnblockActionIds()` for fast synchronous access.
 
 ### Cached Data
 
 | Property | Type | Source |
 |----------|------|--------|
 | `masterUnblockActionIds` | `string[]` | `unblockAction` where `isDefault = true` |
-| `masterFocusTypeIds` | `string[]` | `focusType` where `isDefault = true` |
 
 ### Usage
 
 ```typescript
 constructor(private readonly masterData: MasterDataService) {}
 
-const defaultTypeIds = this.masterData.getFocusTypeIds();
+const actionIds = this.masterData.getUnblockActionIds();
 ```
 
 ### Exported By

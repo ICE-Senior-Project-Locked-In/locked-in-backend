@@ -3,7 +3,7 @@ import { createApiResponseSchema } from "@/common/api/api.schema";
 
 export class ScheduleValidation {
     static readonly titleSchema = z.string("Schedule title is required").min(1, "Schedule title cannot be empty");
-    static readonly typeIdSchema = z.uuid("Schedule type ID is required");
+    static readonly modeIdSchema = z.uuid("Schedule focus mode ID is required");
     static readonly iconSchema = z.string("Schedule icon is required").min(1, "Schedule icon cannot be empty").max(1, "Schedule icon must be a single character");
     static readonly startTimeSchema = z.iso.time("Schedule start time is required");
     static readonly endTimeSchema = z.iso.time("Schedule end time is required");
@@ -17,7 +17,7 @@ export class ScheduleValidation {
 export const scheduleSchema = z.object({
     scheduleId: z.uuid(),
     userId: z.uuid(),
-    typeId: z.uuid(),
+    modeId: z.uuid(),
     title: z.string(),
     icon: z.string().nullable(),
     startTime: z.string(),
@@ -39,7 +39,7 @@ export type ScheduleData = z.infer<typeof scheduleSchema>;
 export type ScheduleListData = z.infer<typeof scheduleListResponseSchema>;
 
 export const createScheduleSchema = z.object({
-    typeId: ScheduleValidation.typeIdSchema,
+    modeId: ScheduleValidation.modeIdSchema,
     title: ScheduleValidation.titleSchema,
     icon: ScheduleValidation.iconSchema.optional(),
     startTime: ScheduleValidation.startTimeSchema,
@@ -49,7 +49,7 @@ export const createScheduleSchema = z.object({
 });
 
 export const updateScheduleSchema = z.object({
-    typeId: ScheduleValidation.typeIdSchema.optional(),
+    modeId: ScheduleValidation.modeIdSchema.optional(),
     title: ScheduleValidation.titleSchema.optional(),
     icon: ScheduleValidation.iconSchema.optional(),
     startTime: ScheduleValidation.startTimeSchema.optional(),

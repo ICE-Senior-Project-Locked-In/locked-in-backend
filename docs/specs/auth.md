@@ -8,7 +8,7 @@ Service: `AuthService`
 
 ### TC-AUTH-01 — Register a new user and return tokens
 
-**Description:** Successfully registers a new user, hashes their password, seeds default unblock actions and focus types, stores a refresh token in Redis, and returns both JWT tokens along with the user profile.
+**Description:** Successfully registers a new user, hashes their password, seeds default unblock actions, stores a refresh token in Redis, and returns both JWT tokens along with the user profile.
 
 **Input:**
 ```json
@@ -23,9 +23,9 @@ Service: `AuthService`
 
 ---
 
-### TC-AUTH-02 — Register seeds default unblock actions and focus types
+### TC-AUTH-02 — Register seeds default unblock actions
 
-**Description:** When a user is created, their account is pre-populated with all default unblock actions and focus types, and an empty inventory is created.
+**Description:** When a user is created, their account is pre-populated with all default unblock actions and an empty inventory is created. Focus modes are created by the user after registration.
 
 **Input:**
 ```json
@@ -36,7 +36,7 @@ Service: `AuthService`
 }
 ```
 
-**Expected Result:** `user.create` is called with `userUnblockActions.create`, `userFocusTypes.create`, and `inventory.create` nested in the data payload.
+**Expected Result:** `user.create` is called with `userUnblockActions.create` and `inventory.create` nested in the data payload.
 
 ---
 

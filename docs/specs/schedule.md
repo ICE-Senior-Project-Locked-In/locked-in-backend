@@ -41,13 +41,13 @@ Service: `ScheduleService`
 
 **Input:**
 - `userId: "user-1"`
-- `data: { typeId: "type-1", title: "Morning Focus", startTime: "09:00:00", endTime: "10:00:00", daysOfWeek: [1, 3, 5] }`
+- `data: { modeId: "mode-1", title: "Morning Focus", startTime: "09:00:00", endTime: "10:00:00", daysOfWeek: [1, 3, 5] }`
 
 **Expected Result:** Returns the created schedule. `focusSchedule.create` is called with:
 ```json
 {
   "data": {
-    "typeId": "type-1",
+    "modeId": "mode-1",
     "title": "Morning Focus",
     "startTime": "09:00:00",
     "endTime": "10:00:00",

@@ -33,9 +33,9 @@ export class FocusLogService {
         });
     }
 
-    async startFocusLog(userId: string, typeId: string, startTime: Date) {
+    async startFocusLog(userId: string, modeId: string, startTime: Date) {
         return this.prismaService.focusLog.create({
-            data: { userId, typeId, startTime }
+            data: { userId, modeId, startTime }
         });
     }
 

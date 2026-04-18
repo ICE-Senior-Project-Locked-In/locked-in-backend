@@ -99,7 +99,6 @@ export class AuthService {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const unblockActionIds = this.master.getUnblockActionIds();
-        const focusTypeIds = this.master.getFocusTypeIds();
 
         const user = await this.prisma.user.create({
             data: {
@@ -113,11 +112,6 @@ export class AuthService {
                 userUnblockActions: {
                     create: unblockActionIds.map((actionId) => ({
                         actionId,
-                    })),
-                },
-                userFocusTypes: {
-                    create: focusTypeIds.map((typeId) => ({
-                        typeId,
                     })),
                 },
                 inventory: {

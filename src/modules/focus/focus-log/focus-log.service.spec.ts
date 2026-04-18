@@ -52,15 +52,15 @@ describe("FocusLogService", () => {
 
     it("should start a focus log", async () => {
         const userId = "user-1";
-        const typeId = "type-1";
+        const modeId = "mode-1";
         const startTime = new Date("2026-01-01T00:00:00.000Z");
-        const createdLog = { logId: "log-1", userId, typeId, startTime };
+        const createdLog = { logId: "log-1", userId, modeId, startTime };
         focusLogMock.create.mockResolvedValue(createdLog);
 
-        const result = await service.startFocusLog(userId, typeId, startTime);
+        const result = await service.startFocusLog(userId, modeId, startTime);
 
         expect(focusLogMock.create).toHaveBeenCalledWith({
-            data: { userId, typeId, startTime },
+            data: { userId, modeId, startTime },
         });
         expect(result).toBe(createdLog);
     });
@@ -98,13 +98,16 @@ describe("FocusLogService", () => {
             fail("Expected endFocusLog to throw HttpApiException");
         } catch (error) {
             expect(error).toBeInstanceOf(HttpApiException);
-            expect((error).getStatus()).toBe(HttpStatus.NOT_FOUND);
-            expect((error).code).toBe("FOCUS_LOG_NOT_FOUND");
-            expect((error).getResponse()).toEqual({
-                message: "Focus log not found for the user",
-                code: "FOCUS_LOG_NOT_FOUND",
-                details: null,
-            });
+
+            if (error instanceof HttpApiException) {
+                expect(error.getStatus()).toBe(HttpStatus.NOT_FOUND);
+                expect(error.code).toBe("FOCUS_LOG_NOT_FOUND");
+                expect(error.getResponse()).toEqual({
+                    message: "Focus log not found for the user",
+                    code: "FOCUS_LOG_NOT_FOUND",
+                    details: null,
+                });
+            }
         }
 
         expect(focusLogMock.update).not.toHaveBeenCalled();

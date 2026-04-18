@@ -65,7 +65,7 @@ AppModule
 ├── UserModule
 ├── FriendModule
 ├── NFCModule
-├── FocusTypeModule
+├── FocusModeModule
 ├── FocusLogModule
 ├── UnblockActionModule
 ├── PetModule
