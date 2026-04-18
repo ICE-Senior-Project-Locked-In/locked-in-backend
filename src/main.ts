@@ -112,7 +112,7 @@ async function bootstrap() {
     appLogger.error({ error }, "Uncaught exception");
   });
 
-  await app.listen(config.port);
+  await app.listen(config.port, '0.0.0.0');
 
   appLogger.info(
     { port: config.port },
