@@ -19,7 +19,7 @@ List all focus schedules for the authenticated user.
     {
       "scheduleId": "uuid",
       "userId": "uuid",
-      "typeId": "uuid",
+      "modeId": "uuid",
       "title": "string",
       "icon": "string | null",
       "startTime": "HH:MM:SS",
@@ -43,7 +43,7 @@ Create a new focus schedule.
 **Request DTO — `CreateScheduleDto`**
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `typeId` | `UUID` | Yes | Focus type ID |
+| `modeId` | `UUID` | Yes | Focus mode ID |
 | `title` | `string` | Yes | Schedule title |
 | `icon` | `string` | No | Icon identifier |
 | `startTime` | `ISO time` | Yes | Daily start time |
@@ -57,7 +57,7 @@ Create a new focus schedule.
   "data": {
     "scheduleId": "uuid",
     "userId": "uuid",
-    "typeId": "uuid",
+    "modeId": "uuid",
     "title": "string",
     "icon": "string | null",
     "startTime": "HH:MM:SS",
@@ -87,7 +87,7 @@ All fields from `CreateScheduleDto` are optional.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `typeId` | `UUID` | No | Focus type ID |
+| `modeId` | `UUID` | No | Focus mode ID |
 | `title` | `string` | No | Schedule title |
 | `icon` | `string` | No | Icon identifier |
 | `startTime` | `ISO time` | No | Daily start time |
@@ -117,3 +117,4 @@ Delete a focus schedule.
 
 - `daysOfWeek` values: `0` = Sunday, `1` = Monday, …, `6` = Saturday.
 - At least one day must be specified; duplicate values are not allowed.
+- `modeId` must reference an existing focus mode (`FocusMode.modeId`) belonging to the authenticated user.

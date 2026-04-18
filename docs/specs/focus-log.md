@@ -32,14 +32,14 @@ Service: `FocusLogService`
 
 ### TC-FLOG-03 — Creates and returns a new focus log entry
 
-**Description:** Starts a new focus session for the user with the given focus type and start timestamp.
+**Description:** Starts a new focus session for the user with the given focus mode and start timestamp.
 
 **Input:**
 - `userId: "user-1"`
-- `typeId: "type-1"`
+- `modeId: "mode-1"`
 - `startTime: new Date("2026-01-01T00:00:00.000Z")`
 
-**Expected Result:** Returns the created log `{ logId: "log-1", userId: "user-1", typeId: "type-1", startTime }`. `focusLog.create` is called with `{ data: { userId, typeId, startTime } }`.
+**Expected Result:** Returns the created log `{ logId: "log-1", userId: "user-1", modeId: "mode-1", startTime }`. `focusLog.create` is called with `{ data: { userId, modeId, startTime } }`.
 
 ---
 

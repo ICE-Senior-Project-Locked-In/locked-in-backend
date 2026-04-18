@@ -1,6 +1,6 @@
 # Focus Module
 
-Manages user focus sessions and focus types. Split into two sub-modules: **Focus Log** (session tracking) and **Focus Type** (session categories).
+Manages user focus sessions and focus modes. Split into two sub-modules: **Focus Log** (session tracking) and **Focus Mode** (user-defined session configurations).
 
 ---
 
@@ -21,7 +21,7 @@ Get all focus logs for the authenticated user.
     {
       "logId": "uuid",
       "userId": "uuid",
-      "typeId": "uuid",
+      "modeId": "uuid",
       "startTime": "ISO datetime",
       "endTime": "ISO datetime | null",
       "createdAt": "ISO datetime",
@@ -45,7 +45,7 @@ Get the currently active (unfinished) focus log for the authenticated user.
   "data": {
     "logId": "uuid",
     "userId": "uuid",
-    "typeId": "uuid",
+    "modeId": "uuid",
     "startTime": "ISO datetime",
     "endTime": null,
     "createdAt": "ISO datetime",
@@ -63,7 +63,7 @@ Start a new focus log session.
 **Request DTO — `StartFocusLogDto`**
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `typeId` | `UUID` | Yes | Focus type ID |
+| `modeId` | `UUID` | Yes | Focus mode ID |
 | `startTime` | `ISO datetime` | Yes | Session start time |
 
 **Response — `FocusLogResponseDto`**
@@ -90,58 +90,26 @@ Same shape as GET active response, with `endTime` populated.
 
 ---
 
-## Focus Type
+## Focus Mode
 
-Manage categories (types) for focus sessions.
+Manage user-defined focus modes. Each mode belongs to the authenticated user and specifies a title, blocked apps, and an optional unblock action.
 
-### GET `/v1/focus-type`
+### GET `/v1/focus-mode`
 
-Get all focus types (default and custom).
-
-**Request** — No body.
-
-**Response — `FocusTypeListResponseDto`**
-```json
-{
-  "data": [
-    {
-      "typeId": "uuid",
-      "name": "string",
-      "isDefault": "boolean",
-      "createdAt": "ISO datetime",
-      "updatedAt": "ISO datetime"
-    }
-  ]
-}
-```
-
----
-
-### GET `/v1/focus-type/default`
-
-Get only default focus types.
-
-**Request** — No body.
-
-**Response — `FocusTypeListResponseDto`**
-Same shape as GET all, filtered to `isDefault: true`.
-
----
-
-### GET `/v1/focus-type/me`
-
-Get focus types associated with the authenticated user.
+Get all focus modes for the authenticated user.
 
 **Request** — No body. Requires auth.
 
-**Response — `UserFocusTypeListResponseDto`**
+**Response — `FocusModeListResponseDto`**
 ```json
 {
   "data": [
     {
-      "id": "uuid",
+      "modeId": "uuid",
       "userId": "uuid",
-      "typeId": "uuid",
+      "title": "string",
+      "blackListedApps": ["string"],
+      "userUnblockActionId": "uuid | null",
       "createdAt": "ISO datetime",
       "updatedAt": "ISO datetime"
     }
@@ -151,46 +119,26 @@ Get focus types associated with the authenticated user.
 
 ---
 
-### POST `/v1/focus-type`
+### POST `/v1/focus-mode`
 
-Create a new focus type.
+Create a new focus mode for the authenticated user.
 
-**Request DTO — `CreateFocusTypeDto`**
+**Request DTO — `CreateFocusModeDto`**
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `name` | `string` | Yes | Focus type name |
+| `title` | `string` | Yes | Name for the focus mode |
+| `blackListedApps` | `string[]` | No | Apps to block during this mode (default: `[]`) |
+| `userUnblockActionId` | `UUID` | No | User unblock action assigned to this mode |
 
-**Response — `FocusTypeResponseDto`**
+**Response — `FocusModeResponseDto`**
 ```json
 {
   "data": {
-    "typeId": "uuid",
-    "name": "string",
-    "isDefault": false,
-    "createdAt": "ISO datetime",
-    "updatedAt": "ISO datetime"
-  }
-}
-```
-
----
-
-### POST `/v1/focus-type/me`
-
-Associate an existing focus type with the authenticated user.
-
-**Request DTO — `CreateUserFocusTypeDto`**
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `typeId` | `UUID` | Yes | Focus type ID to associate |
-
-**Response — `UserFocusTypeResponseDto`**
-```json
-{
-  "data": {
-    "id": "uuid",
+    "modeId": "uuid",
     "userId": "uuid",
-    "typeId": "uuid",
+    "title": "string",
+    "blackListedApps": ["string"],
+    "userUnblockActionId": "uuid | null",
     "createdAt": "ISO datetime",
     "updatedAt": "ISO datetime"
   }
@@ -199,13 +147,36 @@ Associate an existing focus type with the authenticated user.
 
 ---
 
-### DELETE `/v1/focus-type/me/:typeId`
+### PUT `/v1/focus-mode/:modeId`
 
-Remove a focus type association from the authenticated user.
+Update an existing focus mode.
 
 **Path Params**
 | Param | Type | Description |
 |-------|------|-------------|
-| `typeId` | `UUID` | Focus type ID to disassociate |
+| `modeId` | `UUID` | ID of the focus mode to update |
+
+**Request DTO — `UpdateFocusModeDto`**
+All fields are optional.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `title` | `string` | No | Name for the focus mode |
+| `blackListedApps` | `string[]` | No | Apps to block during this mode |
+| `userUnblockActionId` | `UUID` | No | User unblock action assigned to this mode |
+
+**Response — `FocusModeResponseDto`**
+Same shape as POST response, with updated fields.
+
+---
+
+### DELETE `/v1/focus-mode/:modeId`
+
+Delete a focus mode belonging to the authenticated user.
+
+**Path Params**
+| Param | Type | Description |
+|-------|------|-------------|
+| `modeId` | `UUID` | ID of the focus mode to delete |
 
 **Response** — `204 No Content`
