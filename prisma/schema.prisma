@@ -39,7 +39,7 @@ model User {
   credential             Credential?
   focusLogs              FocusLog[]
   focusSchedules         FocusSchedule[]
-  userFocusTypes         UserFocusType[]
+  focusModes             FocusMode[]
   userUnblockActions     UserUnblockAction[]
   sentFriendRequests     Friendship[]        @relation("SentFriendRequests")
   receivedFriendRequests Friendship[]        @relation("ReceivedFriendRequests")
@@ -103,58 +103,49 @@ model UserUnblockAction {
 
   user          User          @relation(fields: [userId], references: [userId])
   unblockAction UnblockAction @relation(fields: [actionId], references: [actionId])
+  focusModes    FocusMode[]
 
   @@unique([userId, actionId])
   @@index([userId])
 }
 
-// Master table for focus types
-model FocusType {
-  typeId    String   @id @default(uuid()) @map("id") @db.Uuid
-  name      String   @unique @map("name")
-  isDefault Boolean  @default(false)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+model FocusMode {
+  modeId              String   @id @default(uuid()) @map("id") @db.Uuid
+  userId              String   @map("user_id") @db.Uuid
+  title               String   @map("title")
+  blackListedApps     String[] @map("black_listed_apps")
+  userUnblockActionId String?  @map("user_unblock_action_id") @db.Uuid
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
 
-  focusLogs      FocusLog[]
-  userFocusTypes UserFocusType[]
-  focusSchedules FocusSchedule[]
-}
+  user              User               @relation(fields: [userId], references: [userId])
+  userUnblockAction UserUnblockAction? @relation(fields: [userUnblockActionId], references: [id])
+  focusLogs         FocusLog[]
+  focusSchedules    FocusSchedule[]
 
-model UserFocusType {
-  id        String   @id @default(uuid()) @map("id") @db.Uuid
-  userId    String   @map("user_id") @db.Uuid
-  typeId    String   @map("type_id") @db.Uuid
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  user      User      @relation(fields: [userId], references: [userId])
-  focusType FocusType @relation(fields: [typeId], references: [typeId])
-
-  @@unique([userId, typeId])
   @@index([userId])
 }
 
 model FocusLog {
   logId     String    @id @default(uuid()) @map("id") @db.Uuid
   userId    String    @map("user_id") @db.Uuid
-  typeId    String    @map("type_id") @db.Uuid
+  modeId    String    @map("mode_id") @db.Uuid
   startTime DateTime  @map("start_time")
   endTime   DateTime? @map("end_time")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
 
   user      User      @relation(fields: [userId], references: [userId])
-  focusType FocusType @relation(fields: [typeId], references: [typeId])
+  focusMode FocusMode @relation(fields: [modeId], references: [modeId])
 
   @@index([userId])
-  @@index([typeId])
+  @@index([modeId])
 }
 
 model FocusSchedule {
   scheduleId String   @id @default(uuid()) @map("id") @db.Uuid
   userId     String   @map("user_id") @db.Uuid
-  typeId     String   @map("type_id") @db.Uuid
+  modeId     String   @map("mode_id") @db.Uuid
   title      String   @map("title")
   icon       String?  @map("icon")
   startTime  DateTime @map("start_time") @db.Time
@@ -166,7 +157,7 @@ model FocusSchedule {
 
   days      FocusScheduleDay[]
   user      User               @relation(fields: [userId], references: [userId])
-  focusType FocusType          @relation(fields: [typeId], references: [typeId])
+  focusMode FocusMode          @relation(fields: [modeId], references: [modeId])
 }
 
 model FocusScheduleDay {
