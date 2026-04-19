@@ -7,6 +7,13 @@ import type { CreateScheduleDto, UpdateScheduleDto } from "./dto/schedule.dto";
 export class ScheduleService {
     constructor(private readonly prismaService: PrismaService) { }
 
+    /// Prisma's `@db.Time` columns are typed as `DateTime` in the generated
+    /// client, so it rejects bare `HH:MM:SS` strings. Anchor to the Unix epoch
+    /// — the DB persists only the time component, so the date drops out.
+    private toTimeDate(time: string): Date {
+        return new Date(`1970-01-01T${time}.000Z`);
+    }
+
     private async ensureScheduleExists(scheduleId: string, userId: string) {
         const existingSchedule = await this.prismaService.focusSchedule.findUnique({
             where: { scheduleId, userId },
@@ -40,11 +47,13 @@ export class ScheduleService {
     }
 
     async create(userId: string, data: CreateScheduleDto) {
-        const { daysOfWeek, ...scheduleData } = data;
+        const { daysOfWeek, startTime, endTime, ...scheduleData } = data;
 
         return this.prismaService.focusSchedule.create({
             data: {
                 ...scheduleData,
+                startTime: this.toTimeDate(startTime),
+                endTime: this.toTimeDate(endTime),
                 userId,
                 days: {
                     create: daysOfWeek.map((dayOfWeek) => ({ dayOfWeek })),
@@ -56,12 +65,18 @@ export class ScheduleService {
     async update(userId: string, scheduleId: string, data: UpdateScheduleDto) {
         await this.ensureScheduleExists(scheduleId, userId);
 
-        const { daysOfWeek, ...scheduleData } = data;
+        const { daysOfWeek, startTime, endTime, ...scheduleData } = data;
 
         return this.prismaService.focusSchedule.update({
             where: { scheduleId, userId },
             data: {
                 ...scheduleData,
+                ...(startTime !== undefined
+                    ? { startTime: this.toTimeDate(startTime) }
+                    : {}),
+                ...(endTime !== undefined
+                    ? { endTime: this.toTimeDate(endTime) }
+                    : {}),
                 ...(daysOfWeek
                     ? {
                         days: {

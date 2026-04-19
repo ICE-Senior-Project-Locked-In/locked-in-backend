@@ -173,9 +173,15 @@ model FocusScheduleDay {
 // Master table for items
 model Item {
   itemId      String   @id @default(uuid()) @map("id") @db.Uuid
+  // Stable, human-readable identifier used by the client (e.g. `decor_ball`).
+  // Keyed separately from `itemId` so purchases and sprite lookups can stay
+  // UUID-agnostic; seed data upserts by `code`.
+  code        String   @unique @db.VarChar(64)
   name        String   @unique
   description String?
   type        ItemType @map("type")
+  // Cost in coins. 0 for non-purchasable items (e.g. starter inventory).
+  price       Int      @default(0)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 

@@ -69,13 +69,13 @@ describe("ScheduleService", () => {
     });
 
     describe("create", () => {
-        it("should create a schedule with days", async () => {
+        it("should create a schedule with days and convert HH:MM:SS to epoch-anchored Date", async () => {
             const userId = "user-1";
             const data: CreateScheduleDto = {
                 modeId: "mode-1",
                 title: "Morning Focus",
                 startTime: "09:00:00",
-                endTime: "10:00:00",
+                endTime: "10:30:00",
                 daysOfWeek: [1, 3, 5],
             } as CreateScheduleDto;
 
@@ -84,10 +84,12 @@ describe("ScheduleService", () => {
 
             const result = await service.create(userId, data);
 
-            const { daysOfWeek, ...scheduleData } = data;
+            const { daysOfWeek, startTime, endTime, ...scheduleData } = data;
             expect(focusScheduleMock.create).toHaveBeenCalledWith({
                 data: {
                     ...scheduleData,
+                    startTime: new Date("1970-01-01T09:00:00.000Z"),
+                    endTime: new Date("1970-01-01T10:30:00.000Z"),
                     userId,
                     days: {
                         create: daysOfWeek.map((dayOfWeek) => ({ dayOfWeek })),
@@ -143,6 +145,28 @@ describe("ScheduleService", () => {
             expect(focusScheduleMock.update).toHaveBeenCalledWith({
                 where: { scheduleId, userId },
                 data,
+            });
+        });
+
+        it("should convert startTime/endTime to epoch-anchored Date when provided", async () => {
+            const userId = "user-1";
+            const scheduleId = "s1";
+            const data: UpdateScheduleDto = {
+                startTime: "07:15:00",
+                endTime: "08:45:00",
+            } as UpdateScheduleDto;
+
+            focusScheduleMock.findUnique.mockResolvedValue({ scheduleId, userId });
+            focusScheduleMock.update.mockResolvedValue({ scheduleId });
+
+            await service.update(userId, scheduleId, data);
+
+            expect(focusScheduleMock.update).toHaveBeenCalledWith({
+                where: { scheduleId, userId },
+                data: {
+                    startTime: new Date("1970-01-01T07:15:00.000Z"),
+                    endTime: new Date("1970-01-01T08:45:00.000Z"),
+                },
             });
         });
 
