@@ -5,8 +5,12 @@ export class ScheduleValidation {
     static readonly titleSchema = z.string("Schedule title is required").min(1, "Schedule title cannot be empty");
     static readonly modeIdSchema = z.uuid("Schedule focus mode ID is required");
     static readonly iconSchema = z.string("Schedule icon is required").min(1, "Schedule icon cannot be empty").max(1, "Schedule icon must be a single character");
-    static readonly startTimeSchema = z.iso.time("Schedule start time is required");
-    static readonly endTimeSchema = z.iso.time("Schedule end time is required");
+    // Prisma's `@db.Time` columns are typed as `DateTime` in the generated
+    // client, which rejects plain `HH:MM:SS` strings with an ISO-8601
+    // validation error. Accept a full ISO datetime here so the value flows
+    // into Prisma as-is; the DB still persists only the time component.
+    static readonly startTimeSchema = z.iso.datetime("Schedule start time must be an ISO-8601 datetime");
+    static readonly endTimeSchema = z.iso.datetime("Schedule end time must be an ISO-8601 datetime");
     static readonly timezoneSchema = z.string("Schedule timezone is required").min(1, "Schedule timezone cannot be empty");
     static readonly daysOfWeekSchema = z.array(z.number().int().min(0).max(6)).nonempty("At least one day of the week must be selected").refine(
         (days) => new Set(days).size === days.length, {
