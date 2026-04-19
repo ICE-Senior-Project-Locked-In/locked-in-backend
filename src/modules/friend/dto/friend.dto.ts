@@ -7,6 +7,8 @@ import {
     updateFriendRequestParamsSchema,
     updateFriendRequestQuerySchema,
     deleteFriendshipParamsSchema,
+    leaderboardQuerySchema,
+    leaderboardResponseSchema,
 } from "@/schemas/friend.schema";
 import { paginationQuerySchema } from "@/schemas/pagination.schema";
 
@@ -17,3 +19,5 @@ export class CreateFriendRequestParamsDto extends createZodDto(createFriendReque
 export class UpdateFriendRequestParamsDto extends createZodDto(updateFriendRequestParamsSchema) { }
 export class UpdateFriendRequestQueryDto extends createZodDto(updateFriendRequestQuerySchema) { }
 export class DeleteFriendshipParamsDto extends createZodDto(deleteFriendshipParamsSchema) { }
+export class LeaderboardQueryDto extends createZodDto(leaderboardQuerySchema) { }
+export class LeaderboardResponseDto extends createZodDto(leaderboardResponseSchema) { }

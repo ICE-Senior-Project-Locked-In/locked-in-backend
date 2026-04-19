@@ -44,3 +44,20 @@ export const updateFriendRequestQuerySchema = z.object({
 export const deleteFriendshipParamsSchema = z.object({
     friendshipId: FriendshipValidation.friendshipIdSchema,
 });
+
+export const leaderboardQuerySchema = z.object({
+    startDate: z.iso.datetime().transform((val) => new Date(val)).optional(),
+    endDate: z.iso.datetime().transform((val) => new Date(val)).optional(),
+    top: z.coerce.number().int().positive().optional(),
+});
+
+export const leaderboardEntrySchema = z.object({
+    rank: z.number().int().positive(),
+    totalFocusTime: z.number().int().min(0),
+    user: userSchema,
+});
+
+export const leaderboardResponseSchema = createApiResponseSchema(z.array(leaderboardEntrySchema));
+
+export type LeaderboardQuery = z.infer<typeof leaderboardQuerySchema>;
+export type LeaderboardEntry = z.infer<typeof leaderboardEntrySchema>;
