@@ -46,8 +46,8 @@ export const deleteFriendshipParamsSchema = z.object({
 });
 
 export const leaderboardQuerySchema = z.object({
-    startDate: z.coerce.date().optional(),
-    endDate: z.coerce.date().optional(),
+    startDate: z.iso.datetime().transform((val) => new Date(val)).optional(),
+    endDate: z.iso.datetime().transform((val) => new Date(val)).optional(),
     top: z.coerce.number().int().positive().optional(),
 });
 
