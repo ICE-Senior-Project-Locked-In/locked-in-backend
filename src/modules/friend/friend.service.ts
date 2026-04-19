@@ -22,8 +22,8 @@ export class FriendService {
         if (!exists) {
             throw new HttpApiException({
                 status: HttpStatus.NOT_FOUND,
-                message: "Focus log not found for the user",
-                code: "FOCUS_LOG_NOT_FOUND",
+                message: "Friendship not found for the user",
+                code: "FRIENDSHIP_NOT_FOUND",
             });
         }
     }
@@ -150,11 +150,18 @@ export class FriendService {
         });
         const userMap = new Map(users.map(u => [u.userId, u]));
 
-        return result.map(entry => ({
-            rank: entry.rank,
-            totalFocusTime: entry.totalFocusTime,
-            user: userMap.get(entry.userId)!,
-        }));
+        return result.map(entry => {
+            const user = userMap.get(entry.userId)!;
+            return {
+                rank: entry.rank,
+                totalFocusTime: entry.totalFocusTime,
+                user: {
+                    ...user,
+                    createdAt: user.createdAt.toISOString(),
+                    updatedAt: user.updatedAt.toISOString(),
+                },
+            };
+        });
     }
 }
 

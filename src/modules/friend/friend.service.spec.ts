@@ -152,7 +152,7 @@ describe("FriendService", () => {
             } catch (error) {
                 expect(error).toBeInstanceOf(HttpApiException);
                 expect((error as HttpApiException).getStatus()).toBe(HttpStatus.NOT_FOUND);
-                expect((error as HttpApiException).code).toBe("FOCUS_LOG_NOT_FOUND");
+                expect((error as HttpApiException).code).toBe("FRIENDSHIP_NOT_FOUND");
             }
 
             expect(friendshipMock.update).not.toHaveBeenCalled();
@@ -191,7 +191,7 @@ describe("FriendService", () => {
             } catch (error) {
                 expect(error).toBeInstanceOf(HttpApiException);
                 expect((error as HttpApiException).getStatus()).toBe(HttpStatus.NOT_FOUND);
-                expect((error as HttpApiException).code).toBe("FOCUS_LOG_NOT_FOUND");
+                expect((error as HttpApiException).code).toBe("FRIENDSHIP_NOT_FOUND");
             }
 
             expect(friendshipMock.delete).not.toHaveBeenCalled();
@@ -237,8 +237,24 @@ describe("FriendService", () => {
 
             const result = await service.getLeaderboard(userId, {});
 
-            expect(result[0]).toMatchObject({ rank: 1, totalFocusTime: 7200, user: friend });
-            expect(result[1]).toMatchObject({ rank: 2, totalFocusTime: 3600, user: self });
+            expect(result[0]).toMatchObject({
+                rank: 1,
+                totalFocusTime: 7200,
+                user: {
+                    ...friend,
+                    createdAt: friend.createdAt.toISOString(),
+                    updatedAt: friend.updatedAt.toISOString(),
+                },
+            });
+            expect(result[1]).toMatchObject({
+                rank: 2,
+                totalFocusTime: 3600,
+                user: {
+                    ...self,
+                    createdAt: self.createdAt.toISOString(),
+                    updatedAt: self.updatedAt.toISOString(),
+                },
+            });
         });
 
         it("should give totalFocusTime of 0 for users with no completed logs", async () => {
@@ -335,8 +351,22 @@ describe("FriendService", () => {
             const result = await service.getLeaderboard(userId, { top: 1 });
 
             expect(result).toHaveLength(2);
-            expect(result[0]).toMatchObject({ rank: 1, user: f2 });
-            expect(result[1]).toMatchObject({ rank: 3, user: self });
+            expect(result[0]).toMatchObject({
+                rank: 1,
+                user: {
+                    ...f2,
+                    createdAt: f2.createdAt.toISOString(),
+                    updatedAt: f2.updatedAt.toISOString(),
+                },
+            });
+            expect(result[1]).toMatchObject({
+                rank: 3,
+                user: {
+                    ...self,
+                    createdAt: self.createdAt.toISOString(),
+                    updatedAt: self.updatedAt.toISOString(),
+                },
+            });
         });
 
         it("should not duplicate current user when already in top N", async () => {
@@ -358,7 +388,14 @@ describe("FriendService", () => {
             const result = await service.getLeaderboard(userId, { top: 1 });
 
             expect(result).toHaveLength(1);
-            expect(result[0]).toMatchObject({ rank: 1, user: self });
+            expect(result[0]).toMatchObject({
+                rank: 1,
+                user: {
+                    ...self,
+                    createdAt: self.createdAt.toISOString(),
+                    updatedAt: self.updatedAt.toISOString(),
+                },
+            });
         });
     });
 });
