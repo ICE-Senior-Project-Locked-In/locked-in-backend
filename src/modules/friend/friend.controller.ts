@@ -15,7 +15,10 @@ import {
     UpdateFriendRequestParamsDto,
     UpdateFriendRequestQueryDto,
     DeleteFriendshipParamsDto,
+    LeaderboardQueryDto,
+    LeaderboardResponseDto,
 } from "./dto/friend.dto";
+import { LeaderboardEntry } from "@/schemas/friend.schema";
 import { User, Friendship } from "@prisma/client";
 
 @ApiTags("Friend")
@@ -28,6 +31,15 @@ export class FriendController {
         private readonly logger: AppLogger
     ) {
         this.logger.setContext(FriendController.name);
+    }
+
+    @Get("leaderboard")
+    @ApiOkResponse({ type: LeaderboardResponseDto, description: "Get friends leaderboard ranked by total focus time" })
+    async getLeaderboard(
+        @Query() query: LeaderboardQueryDto,
+        @CurrentUser() user: AuthUser
+    ): Promise<LeaderboardEntry[]> {
+        return this.friendService.getLeaderboard(user.userId, query);
     }
 
     @Get()
