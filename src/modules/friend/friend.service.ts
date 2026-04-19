@@ -137,8 +137,8 @@ export class FriendService {
             const topSlice = ranked.slice(0, query.top);
             const currentUserInTop = topSlice.some(e => e.userId === userId);
             if (!currentUserInTop) {
-                const currentUserEntry = ranked.find(e => e.userId === userId)!;
-                result = [...topSlice, currentUserEntry];
+                const currentUserEntry = ranked.find(e => e.userId === userId);
+                result = currentUserEntry ? [...topSlice, currentUserEntry] : topSlice;
             } else {
                 result = topSlice;
             }
