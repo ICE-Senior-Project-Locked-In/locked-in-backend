@@ -84,8 +84,8 @@ export class FriendController {
     ) {
         const { friendshipId } = params;
         this.logger.info(
-            { module: "focus-type", userId: user.userId, friendshipId },
-            "Deleting user focus type"
+            { module: "friend", userId: user.userId, friendshipId },
+            "Deleting friendship"
         );
         await this.friendService.deleteFriendship(user.userId, friendshipId);
     }
