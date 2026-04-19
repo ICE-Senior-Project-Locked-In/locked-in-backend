@@ -16,13 +16,25 @@ describe("FriendService", () => {
         delete: jest.fn(),
     };
 
+    const focusLogMock = {
+        findMany: jest.fn(),
+    };
+
+    const userMock = {
+        findMany: jest.fn(),
+    };
+
     const prismaServiceMock = {
         friendship: friendshipMock,
+        focusLog: focusLogMock,
+        user: userMock,
     } as unknown as PrismaService;
 
     beforeEach(() => {
         jest.clearAllMocks();
         service = new FriendService(prismaServiceMock);
+        focusLogMock.findMany.mockResolvedValue([]);
+        userMock.findMany.mockResolvedValue([]);
     });
 
     describe("getFriends", () => {
@@ -140,7 +152,7 @@ describe("FriendService", () => {
             } catch (error) {
                 expect(error).toBeInstanceOf(HttpApiException);
                 expect((error as HttpApiException).getStatus()).toBe(HttpStatus.NOT_FOUND);
-                expect((error as HttpApiException).code).toBe("FOCUS_LOG_NOT_FOUND");
+                expect((error as HttpApiException).code).toBe("FRIENDSHIP_NOT_FOUND");
             }
 
             expect(friendshipMock.update).not.toHaveBeenCalled();
@@ -179,10 +191,211 @@ describe("FriendService", () => {
             } catch (error) {
                 expect(error).toBeInstanceOf(HttpApiException);
                 expect((error as HttpApiException).getStatus()).toBe(HttpStatus.NOT_FOUND);
-                expect((error as HttpApiException).code).toBe("FOCUS_LOG_NOT_FOUND");
+                expect((error as HttpApiException).code).toBe("FRIENDSHIP_NOT_FOUND");
             }
 
             expect(friendshipMock.delete).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("getLeaderboard", () => {
+        const makeUser = (userId: string) => ({
+            userId,
+            email: `${userId}@test.com`,
+            name: userId,
+            balance: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        const makeLog = (userId: string, startTime: Date, endTime: Date) => ({
+            logId: `log-${userId}-${startTime.getTime()}`,
+            userId,
+            modeId: "mode-1",
+            startTime,
+            endTime,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        it("should return current user and friends ranked by total focus time", async () => {
+            const userId = "user-1";
+            const friend = makeUser("user-2");
+            const self = makeUser(userId);
+
+            friendshipMock.findMany.mockResolvedValue([
+                { senderId: userId, receiverId: "user-2" },
+            ]);
+
+            const start = new Date("2025-01-01T00:00:00Z");
+            focusLogMock.findMany.mockResolvedValue([
+                makeLog(userId, start, new Date(start.getTime() + 3600_000)),   // 3600s
+                makeLog("user-2", start, new Date(start.getTime() + 7200_000)), // 7200s
+            ]);
+
+            userMock.findMany.mockResolvedValue([self, friend]);
+
+            const result = await service.getLeaderboard(userId, {});
+
+            expect(result[0]).toMatchObject({
+                rank: 1,
+                totalFocusTime: 7200,
+                user: {
+                    ...friend,
+                    createdAt: friend.createdAt.toISOString(),
+                    updatedAt: friend.updatedAt.toISOString(),
+                },
+            });
+            expect(result[1]).toMatchObject({
+                rank: 2,
+                totalFocusTime: 3600,
+                user: {
+                    ...self,
+                    createdAt: self.createdAt.toISOString(),
+                    updatedAt: self.updatedAt.toISOString(),
+                },
+            });
+        });
+
+        it("should give totalFocusTime of 0 for users with no completed logs", async () => {
+            const userId = "user-1";
+            const self = makeUser(userId);
+            const friend = makeUser("user-2");
+
+            friendshipMock.findMany.mockResolvedValue([
+                { senderId: userId, receiverId: "user-2" },
+            ]);
+            focusLogMock.findMany.mockResolvedValue([
+                makeLog(userId, new Date("2025-01-01T00:00:00Z"), new Date("2025-01-01T01:00:00Z")),
+            ]);
+            userMock.findMany.mockResolvedValue([self, friend]);
+
+            const result = await service.getLeaderboard(userId, {});
+
+            const friendEntry = result.find(e => e.user.userId === "user-2")!;
+            expect(friendEntry.totalFocusTime).toBe(0);
+        });
+
+        it("should assign the same dense rank to tied participants", async () => {
+            const userId = "user-1";
+            const self = makeUser(userId);
+            const f2 = makeUser("user-2");
+            const f3 = makeUser("user-3");
+
+            friendshipMock.findMany.mockResolvedValue([
+                { senderId: userId, receiverId: "user-2" },
+                { senderId: userId, receiverId: "user-3" },
+            ]);
+
+            const start = new Date("2025-01-01T00:00:00Z");
+            const end = new Date(start.getTime() + 3600_000);
+            focusLogMock.findMany.mockResolvedValue([
+                makeLog(userId, start, end),
+                makeLog("user-2", start, end),
+                makeLog("user-3", start, end),
+            ]);
+            userMock.findMany.mockResolvedValue([self, f2, f3]);
+
+            const result = await service.getLeaderboard(userId, {});
+
+            expect(result.every(e => e.rank === 1)).toBe(true);
+        });
+
+        it("should filter focus logs by startDate and endDate", async () => {
+            const userId = "user-1";
+            const self = makeUser(userId);
+
+            friendshipMock.findMany.mockResolvedValue([]);
+
+            const inRange = makeLog(userId, new Date("2025-01-15T00:00:00Z"), new Date("2025-01-15T00:30:00Z")); // 1800s
+            focusLogMock.findMany.mockResolvedValue([inRange]);
+            userMock.findMany.mockResolvedValue([self]);
+
+            const result = await service.getLeaderboard(userId, {
+                startDate: new Date("2025-01-01T00:00:00Z"),
+                endDate: new Date("2025-01-31T23:59:59Z"),
+            });
+
+            expect(focusLogMock.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    where: expect.objectContaining({
+                        startTime: expect.objectContaining({
+                            gte: new Date("2025-01-01T00:00:00Z"),
+                            lte: new Date("2025-01-31T23:59:59Z"),
+                        }),
+                    }),
+                })
+            );
+            expect(result[0].totalFocusTime).toBe(1800);
+        });
+
+        it("should limit to top N and append current user if outside top N", async () => {
+            const userId = "user-1";
+            const self = makeUser(userId);
+            const f2 = makeUser("user-2");
+            const f3 = makeUser("user-3");
+
+            friendshipMock.findMany.mockResolvedValue([
+                { senderId: userId, receiverId: "user-2" },
+                { senderId: userId, receiverId: "user-3" },
+            ]);
+
+            const start = new Date("2025-01-01T00:00:00Z");
+            focusLogMock.findMany.mockResolvedValue([
+                makeLog("user-2", start, new Date(start.getTime() + 7200_000)), // 7200s rank 1
+                makeLog("user-3", start, new Date(start.getTime() + 3600_000)), // 3600s rank 2
+                // user-1 has 0s → rank 3
+            ]);
+            userMock.findMany.mockResolvedValue([self, f2, f3]);
+
+            const result = await service.getLeaderboard(userId, { top: 1 });
+
+            expect(result).toHaveLength(2);
+            expect(result[0]).toMatchObject({
+                rank: 1,
+                user: {
+                    ...f2,
+                    createdAt: f2.createdAt.toISOString(),
+                    updatedAt: f2.updatedAt.toISOString(),
+                },
+            });
+            expect(result[1]).toMatchObject({
+                rank: 3,
+                user: {
+                    ...self,
+                    createdAt: self.createdAt.toISOString(),
+                    updatedAt: self.updatedAt.toISOString(),
+                },
+            });
+        });
+
+        it("should not duplicate current user when already in top N", async () => {
+            const userId = "user-1";
+            const self = makeUser(userId);
+            const friend = makeUser("user-2");
+
+            friendshipMock.findMany.mockResolvedValue([
+                { senderId: userId, receiverId: "user-2" },
+            ]);
+
+            const start = new Date("2025-01-01T00:00:00Z");
+            focusLogMock.findMany.mockResolvedValue([
+                makeLog(userId, start, new Date(start.getTime() + 7200_000)), // 7200s rank 1
+                makeLog("user-2", start, new Date(start.getTime() + 3600_000)), // 3600s rank 2
+            ]);
+            userMock.findMany.mockResolvedValue([self, friend]);
+
+            const result = await service.getLeaderboard(userId, { top: 1 });
+
+            expect(result).toHaveLength(1);
+            expect(result[0]).toMatchObject({
+                rank: 1,
+                user: {
+                    ...self,
+                    createdAt: self.createdAt.toISOString(),
+                    updatedAt: self.updatedAt.toISOString(),
+                },
+            });
         });
     });
 });

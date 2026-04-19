@@ -114,3 +114,79 @@ Service: `FriendService`
 - `friendshipId: "f1"`
 
 **Expected Result:** Throws `HttpApiException` with HTTP 404 Not Found and error code `FOCUS_LOG_NOT_FOUND`. `friendship.delete` is never called.
+
+---
+
+## getLeaderboard
+
+### TC-FRIEND-10 — Returns current user and friends ranked by total focus time
+
+**Description:** Fetches all accepted friends plus the current user, sums their completed focus log durations, and returns them sorted descending with dense ranks.
+
+**Input:**
+- `userId: "user-1"` *(one accepted friend "user-2")*
+- No `startDate`, `endDate`, or `top`
+- user-1 has 3600s of completed logs; user-2 has 7200s
+
+**Expected Result:** Returns `[{ rank: 1, totalFocusTime: 7200, user: user-2 }, { rank: 2, totalFocusTime: 3600, user: user-1 }]`.
+
+---
+
+### TC-FRIEND-11 — Users with no completed logs receive totalFocusTime of 0
+
+**Description:** A participant with no matching completed focus logs is included in the result with `totalFocusTime: 0`.
+
+**Input:**
+- `userId: "user-1"` *(one accepted friend "user-2")*
+- user-1 has 3600s of completed logs; user-2 has no logs
+
+**Expected Result:** Returns `[{ rank: 1, totalFocusTime: 3600, user: user-1 }, { rank: 2, totalFocusTime: 0, user: user-2 }]`.
+
+---
+
+### TC-FRIEND-12 — Ties share the same dense rank
+
+**Description:** When two participants have equal `totalFocusTime`, they receive the same rank and the next rank is not skipped.
+
+**Input:**
+- `userId: "user-1"`, friends: `["user-2", "user-3"]`
+- All three have 3600s of completed logs
+
+**Expected Result:** All three entries have `rank: 1`.
+
+---
+
+### TC-FRIEND-13 — Filters focus logs by startDate and endDate
+
+**Description:** Only focus logs whose `startTime` falls within the provided range are counted.
+
+**Input:**
+- `userId: "user-1"`, one friend `"user-2"`
+- `startDate: "2025-01-01T00:00:00.000Z"`, `endDate: "2025-01-31T23:59:59.000Z"`
+- user-1 has one log within range (1800s) and one outside range (3600s)
+
+**Expected Result:** `totalFocusTime` for user-1 is `1800`.
+
+---
+
+### TC-FRIEND-14 — top param limits results and always includes the current user
+
+**Description:** When `top` is set and the current user ranks outside the top N, they are appended at the end with their actual rank.
+
+**Input:**
+- `userId: "user-1"` *(two friends: user-2 with 7200s, user-3 with 3600s)*
+- user-1 has 0s; `top: 1`
+
+**Expected Result:** Returns two entries: `[{ rank: 1, user: user-2 }, { rank: 3, user: user-1 }]`. user-3 is excluded.
+
+---
+
+### TC-FRIEND-15 — Current user is within top N and not duplicated
+
+**Description:** When the current user already appears within the top N, they are not appended again.
+
+**Input:**
+- `userId: "user-1"` *(one friend: user-2 with 3600s)*
+- user-1 has 7200s; `top: 1`
+
+**Expected Result:** Returns `[{ rank: 1, totalFocusTime: 7200, user: user-1 }]` — only one entry, no duplicate.

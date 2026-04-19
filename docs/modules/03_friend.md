@@ -98,6 +98,44 @@ Remove a friendship.
 
 ---
 
+### GET `/v1/friend/leaderboard`
+
+Get the authenticated user and all their accepted friends ranked by total completed focus time.
+
+**Query Params — `LeaderboardQueryDto`**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `startDate` | ISO 8601 datetime | No | Lower bound for focus log `startTime` filter |
+| `endDate` | ISO 8601 datetime | No | Upper bound for focus log `startTime` filter |
+| `top` | positive integer | No | Limit results to top N; current user always included even if outside top N |
+
+- Omitting both `startDate` and `endDate` returns all-time totals.
+- Only completed focus logs (`endTime != null`) are counted.
+- `totalFocusTime` is in seconds.
+- Ties share the same rank (dense ranking).
+
+**Response — `LeaderboardResponseDto`**
+```json
+{
+  "data": [
+    {
+      "rank": 1,
+      "totalFocusTime": 7200,
+      "user": {
+        "userId": "uuid",
+        "email": "string",
+        "name": "string",
+        "balance": 0,
+        "createdAt": "ISO datetime",
+        "updatedAt": "ISO datetime"
+      }
+    }
+  ]
+}
+```
+
+---
+
 ## Notes
 
 - `FriendshipStatus` enum values: `PENDING`, `ACCEPTED`, `REJECTED`
