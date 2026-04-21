@@ -5,8 +5,8 @@ export class ScheduleValidation {
     static readonly titleSchema = z.string("Schedule title is required").min(1, "Schedule title cannot be empty");
     static readonly modeIdSchema = z.uuid("Schedule focus mode ID is required");
     static readonly iconSchema = z.string("Schedule icon is required").min(1, "Schedule icon cannot be empty").max(1, "Schedule icon must be a single character");
-    static readonly startTimeSchema = z.iso.time("Schedule start time is required");
-    static readonly endTimeSchema = z.iso.time("Schedule end time is required");
+    static readonly startTimeSchema = z.iso.datetime("Schedule start time is required");
+    static readonly endTimeSchema = z.iso.datetime("Schedule end time is required");
     static readonly timezoneSchema = z.string("Schedule timezone is required").min(1, "Schedule timezone cannot be empty");
     static readonly daysOfWeekSchema = z.array(z.number().int().min(0).max(6)).nonempty("At least one day of the week must be selected").refine(
         (days) => new Set(days).size === days.length, {
@@ -20,8 +20,8 @@ export const scheduleSchema = z.object({
     modeId: z.uuid(),
     title: z.string(),
     icon: z.string().nullable(),
-    startTime: z.string(),
-    endTime: z.string(),
+    startTime: z.iso.datetime(),
+    endTime: z.iso.datetime(),
     timezone: z.string(),
     active: z.boolean(),
     createdAt: z.iso.datetime(),
