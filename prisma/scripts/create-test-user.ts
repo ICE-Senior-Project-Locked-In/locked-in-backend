@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
+import { confirmDatabase } from "./utils";
 
 const prisma = new PrismaClient();
 
@@ -44,4 +45,9 @@ async function createTestUser() {
     }
 }
 
-createTestUser();
+async function main() {
+    await confirmDatabase("Create test user");
+    await createTestUser();
+}
+
+main();
