@@ -14,6 +14,7 @@ import { UnblockActionModule } from './modules/unblock-action/unblock-action.mod
 import { PetModule } from './modules/pet/pet.module';
 import { ScheduleModule } from './modules/schedule/schedule.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
+import { ItemModule } from './modules/item/item.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { InventoryModule } from './modules/inventory/inventory.module';
     PetModule,
     ScheduleModule,
     InventoryModule,
+    ItemModule,
   ],
   controllers: [AppController],
   providers: [AppService],
