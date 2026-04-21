@@ -23,6 +23,7 @@ enum PetType {
   ORANGE_CAT
   GRAY_CAT
   WHITE_CAT
+  CREAM_CAT
 }
 
 model User {
@@ -176,6 +177,7 @@ model Item {
   name        String   @unique
   description String?
   type        ItemType @map("type")
+  price       Int      @default(0)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
