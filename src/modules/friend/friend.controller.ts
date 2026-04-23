@@ -52,6 +52,16 @@ export class FriendController {
         return this.friendService.getFriends(user.userId, pagination);
     }
 
+    @Get("requests")
+    @ApiOkResponse({ type: FriendshipResponseDto, description: "Retrieve pending friend requests for the current user" })
+    async getFriendRequests(
+        @Query() query: FriendFiltersDto,
+        @CurrentUser() user: AuthUser
+    ): Promise<PaginatedResponse<Friendship>> {
+        const pagination = PaginationHelper.getOptions(query);
+        return this.friendService.getFriendRequests(user.userId, pagination);
+    }
+
     @Post("request/:receiverId")
     @ApiOkResponse({ type: FriendshipResponseDto, description: "Send a friend request to another user" })
     async sendFriendRequest(

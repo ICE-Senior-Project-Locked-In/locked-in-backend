@@ -1,4 +1,4 @@
-import { Controller, Post, Delete, Body, UseGuards, HttpStatus, HttpCode } from "@nestjs/common";
+import { Controller, Post, Delete, Body, UseGuards, HttpStatus, HttpCode, Get } from "@nestjs/common";
 import { ApiTags, ApiBearerAuth, ApiBody, ApiOkResponse, ApiNoContentResponse } from "@nestjs/swagger";
 import { AppLogger } from "@/logger/app-logger.service";
 import { JwtAuthGuard } from "@/common/http/guards/jwt-auth.guard";
@@ -18,6 +18,14 @@ export class NFCController {
         private readonly logger: AppLogger
     ) {
         this.logger.setContext(NFCController.name);
+    }
+
+    @Get()
+    @ApiOkResponse({ type: NFCResponseDto, description: "Get currently paired NFC device for the user" })
+    async getPairedDevice(
+        @CurrentUser() user: AuthUser
+    ) {
+        return this.nfcService.getPairedDevice(user.userId);
     }
 
     @Post()
