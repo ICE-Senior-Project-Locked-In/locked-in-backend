@@ -6,6 +6,12 @@ import { PairNFCData } from "@/schemas/nfc.schema";
 export class NFCService {
     constructor(private readonly prismaService: PrismaService) { }
 
+    async getPairedDevice(userId: string) {
+        return this.prismaService.nFCDevice.findUnique({
+            where: { userId }
+        })
+    }
+
     async pair(userId: string, data: PairNFCData) {
         const { serialNumber } = data;
 
