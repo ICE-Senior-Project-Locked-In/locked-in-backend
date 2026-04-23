@@ -84,6 +84,29 @@ export class FriendService {
         };
     }
 
+    async getSentFriendRequests(userId: string, paginationOptions?: PaginationOptions): Promise<PaginatedResponse<Friendship>> {
+        const where: Prisma.FriendshipWhereInput = {
+            senderId: userId,
+            status: FriendshipStatus.PENDING,
+        };
+
+        const offset = PaginationHelper.getOffset(paginationOptions);
+
+        const [requests, total] = await Promise.all([
+            this.prismaService.friendship.findMany({
+                where,
+                include: { receiver: true },
+                ...offset,
+            }),
+            this.prismaService.friendship.count({ where }),
+        ]);
+
+        return {
+            data: requests,
+            pagination: PaginationHelper.getMetaData(total, paginationOptions),
+        };
+    }
+
     async createFriendRequest(senderId: string, receiverId: string): Promise<Friendship> {
         return this.prismaService.friendship.create({
             data: {
