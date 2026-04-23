@@ -61,6 +61,29 @@ export class FriendService {
         };
     }
 
+    async getFriendRequests(userId: string, paginationOptions?: PaginationOptions): Promise<PaginatedResponse<Friendship>> {
+        const where: Prisma.FriendshipWhereInput = {
+            receiverId: userId,
+            status: FriendshipStatus.PENDING,
+        };
+
+        const offset = PaginationHelper.getOffset(paginationOptions);
+
+        const [requests, total] = await Promise.all([
+            this.prismaService.friendship.findMany({
+                where,
+                include: { sender: true },
+                ...offset,
+            }),
+            this.prismaService.friendship.count({ where }),
+        ]);
+
+        return {
+            data: requests,
+            pagination: PaginationHelper.getMetaData(total, paginationOptions),
+        };
+    }
+
     async createFriendRequest(senderId: string, receiverId: string): Promise<Friendship> {
         return this.prismaService.friendship.create({
             data: {
@@ -136,11 +159,11 @@ export class FriendService {
         if (query.top !== undefined) {
             const topSlice = ranked.slice(0, query.top);
             const currentUserInTop = topSlice.some(e => e.userId === userId);
-            if (!currentUserInTop) {
+            if (currentUserInTop) {
+                result = topSlice;
+            } else {
                 const currentUserEntry = ranked.find(e => e.userId === userId);
                 result = currentUserEntry ? [...topSlice, currentUserEntry] : topSlice;
-            } else {
-                result = topSlice;
             }
         }
 
