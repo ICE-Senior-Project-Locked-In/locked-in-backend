@@ -13,7 +13,6 @@ services:
       TZ: "UTC"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./packages/db/init-scripts:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U locked_in_user -d locked_in_db"]
       interval: 10s
@@ -49,11 +48,33 @@ services:
     networks:
       - locked-in-network
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: locked-in-api
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://locked_in_user:locked_in_password@postgres:5432/locked_in_db
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - locked-in-network
+
 volumes:
   postgres_data:
     driver: local
   redis_data:
     driver: local
+
 networks:
   locked-in-network:
     driver: bridge

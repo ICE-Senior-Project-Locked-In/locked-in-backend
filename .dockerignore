@@ -3,7 +3,8 @@ dist
 build
 .next
 .turbo
-.env*.local
+.env
+.env.*
 *.log
 coverage
 .git
@@ -11,3 +12,4 @@ coverage
 README.md
 .vscode
 .idea
+docker-compose.yml
