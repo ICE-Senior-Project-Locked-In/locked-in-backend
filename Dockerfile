@@ -16,7 +16,7 @@ RUN corepack enable && corepack prepare pnpm@10.12.2 --activate
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN pnpm prisma generate && pnpm build
+RUN pnpm prisma generate && pnpm build && ls -la dist/
 
 # ── Stage 3: runner ──────────────────────────────────────────────────────────
 FROM node:22-alpine AS runner
